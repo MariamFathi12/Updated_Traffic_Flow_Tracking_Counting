@@ -12,7 +12,7 @@ This repository contains a project for traffic flow tracking and counting using 
 
 ## Prerequisites
 
-Make sure you have Python installed on your system. You can download it from [python.org](https://www.python.org/).
+Make sure you have Python v3.10 installed on your system. You can download it from [python.org](https://www.python.org/).
 
 ## Installation
 
@@ -27,9 +27,19 @@ Make sure you have Python installed on your system. You can download it from [py
     Change to the project directory:
     ```bash
    
-   cd Updated_Traffic_Flow_Tracking_Counting
+   cd vehicle-counting-yolov5
 
 3. **Install Dependencies**
-    Install the required Python packages using pip:
+
+    Install the required Python packages by running this in terminal :
+    ```bash
 
     pip install -r requirements.txt
+
+
+4.  **Run the Tracking Algorithm**
+
+     python tracker.py OR py tracker.py
+
+
+
