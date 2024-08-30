@@ -228,7 +228,7 @@ def detect(opt):
                 
                 thickness = 3 # font thickness
                 font = cv2.FONT_HERSHEY_SIMPLEX
-                fontScale = 1.6 
+                fontScale = 2.5 
                 #cv2.putText(im0, "Outgoing Traffic:  "+str(up_count), (60, 150), font, 
                 #   fontScale, (0,0,255), thickness, cv2.LINE_AA)
 
@@ -239,14 +239,14 @@ def detect(opt):
                 # It is the count of both incoming and outgoing vehicles 
                 
                 #Objects 
-                cv2.putText(im0, "Cars:  "+str(car_count), (60, 250), font, 
-                1.5, (20,255,0), 3, cv2.LINE_AA)                
+                #cv2.putText(im0, "Cars:  "+str(car_count), (60, 250), font, 
+                #1.5, (20,255,0), 3, cv2.LINE_AA)                
 
-                cv2.putText(im0, "Trucks:  "+str(truck_count), (60, 350), font, 
-                1.5, (20,255,0), 3, cv2.LINE_AA)  
+                #cv2.putText(im0, "Trucks:  "+str(truck_count), (60, 350), font, 
+                #1.5, (20,255,0), 3, cv2.LINE_AA)  
 
-                cv2.putText(im0, "Busses:  "+str(bus_count), (60, 450), font, 
-                1.5, (20,255,0), 3, cv2.LINE_AA)  
+                #cv2.putText(im0, "Busses:  "+str(bus_count), (60, 450), font, 
+                #1.5, (20,255,0), 3, cv2.LINE_AA)  
                 
 
                 
