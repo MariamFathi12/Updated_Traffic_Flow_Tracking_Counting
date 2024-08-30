@@ -51,9 +51,14 @@ Make sure you have Python v3.10 installed on your system. You can download it fr
 
     cd vehicle-counting-yolov5
 
-3. **Install Dependencies**
 
-    Install the required Python packages by running this in terminal :
+5. **Install Dependencies**
+
+    1.Clone the legacy Yolo-v5 Repository
+    ```bash
+    git clone https://github.com/ultralytics/yolov5.git
+
+    2.Install the required Python packages by running this in terminal :
     ```bash
 
     pip install -r requirements.txt
@@ -62,7 +67,7 @@ Make sure you have Python v3.10 installed on your system. You can download it fr
 4.  **Run the Tracking Algorithm**
     ```bash
 
-     python tracker.py OR py tracker.py
+     python 3.10 tracker.py OR py -3.10 tracker.py
 
 
 
