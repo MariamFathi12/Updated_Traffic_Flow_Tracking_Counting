@@ -11,12 +11,6 @@ This repository contains a project for traffic flow tracking and counting using 
 - [Model Weights](#model-weights)
 
 
-!git clone https://github.com/MariamFathi12/Updated_Traffic_Flow_Tracking_Counting.git
-%cd Updated_Traffic_Flow_Tracking_Counting
-!git checkout Flow_Tracking_Counting
-%cd vehicle-counting-yolov5
-!pip install -r requirements.txt
-
 ## Prerequisites
 
 Make sure you have Python v3.10 installed on your system. You can download it from [python.org](https://www.python.org/downloads/release/python-3100/).
