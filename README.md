@@ -57,16 +57,18 @@ Make sure you have Python v3.10 installed on your system. You can download it fr
 
     py -3.10 -m pip install ultralytics
 
-7.**Install the required Python packages by running this in terminal :**
-    ```bash
-    
+7.  **Install the required Python packages by running this in terminal :**
+     ```bash
+
     py -3.10 -m pip install -r requirements.txt
 
 
 6.  **Run the Tracking Algorithm**
     ```bash
 
-     py -3.10 tracker.py       OR      python -3.10 tracker.py
+     py -3.10 tracker.py      
+      OR    
+     python -3.10 tracker.py
 
 
 
