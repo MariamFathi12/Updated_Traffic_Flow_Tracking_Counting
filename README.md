@@ -52,9 +52,14 @@ Make sure you have Python v3.10 installed on your system. You can download it fr
     ```bash
     git clone https://github.com/ultralytics/yolov5.git
 
+6. **Install Ultralytics**
+    ```bash
 
-    Install the required Python packages by running this in terminal :
+    py -3.10 -m pip install ultralytics
 
+7.**Install the required Python packages by running this in terminal :**
+    ```bash
+    
     py -3.10 -m pip install -r requirements.txt
 
 
