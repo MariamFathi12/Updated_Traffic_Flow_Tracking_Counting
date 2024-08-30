@@ -19,7 +19,7 @@ This repository contains a project for traffic flow tracking and counting using 
 
 ## Prerequisites
 
-Make sure you have Python v3.10 installed on your system. You can download it from [python.org](https://www.python.org/).
+Make sure you have Python v3.10 installed on your system. You can download it from [python.org](https://www.python.org/downloads/release/python-3100/).
 
 ## Installation
 
