@@ -54,17 +54,17 @@ Make sure you have Python v3.10 installed on your system. You can download it fr
 
 5. **Install Dependencies**
 
-    1.Clone the legacy Yolo-v5 Repository
+1. **Clone the legacy Yolo-v5 Repository**
     ```bash
     git clone https://github.com/ultralytics/yolov5.git
 
-    2.Install the required Python packages by running this in terminal :
+2. **Install the required Python packages by running this in terminal :**
     ```bash
 
     pip install -r requirements.txt
 
 
-4.  **Run the Tracking Algorithm**
+6.  **Run the Tracking Algorithm**
     ```bash
 
      python 3.10 tracker.py OR py -3.10 tracker.py
