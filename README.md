@@ -60,6 +60,7 @@ Make sure you have Python v3.10 installed on your system. You can download it fr
 
 
 4.  **Run the Tracking Algorithm**
+    ```bash
 
      python tracker.py OR py tracker.py
 
