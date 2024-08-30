@@ -52,15 +52,16 @@ Make sure you have Python v3.10 installed on your system. You can download it fr
     ```bash
     git clone https://github.com/ultralytics/yolov5.git
 
+
     Install the required Python packages by running this in terminal :
 
-    pip install -r requirements.txt
+    py -3.10 -m pip install -r requirements.txt
 
 
 6.  **Run the Tracking Algorithm**
     ```bash
 
-     python 3.10 tracker.py OR py -3.10 tracker.py
+     py -3.10 tracker.py       OR      python -3.10 tracker.py
 
 
 
