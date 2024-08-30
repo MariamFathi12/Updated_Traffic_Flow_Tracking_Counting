@@ -10,6 +10,13 @@ This repository contains a project for traffic flow tracking and counting using 
 - [Running the Algorithm](#running-the-algorithm)
 - [Model Weights](#model-weights)
 
+
+!git clone https://github.com/MariamFathi12/Updated_Traffic_Flow_Tracking_Counting.git
+%cd Updated_Traffic_Flow_Tracking_Counting
+!git checkout Flow_Tracking_Counting
+%cd vehicle-counting-yolov5
+!pip install -r requirements.txt
+
 ## Prerequisites
 
 Make sure you have Python v3.10 installed on your system. You can download it from [python.org](https://www.python.org/).
@@ -22,12 +29,27 @@ Make sure you have Python v3.10 installed on your system. You can download it fr
    ```bash
    git clone https://github.com/MariamFathi12/Updated_Traffic_Flow_Tracking_Counting.git
 
-2. **Navigate to the Project Directory**
+2. **Navigate to the Repo Directory**
 
     Change to the project directory:
     ```bash
    
-   cd vehicle-counting-yolov5
+   cd Updated_Traffic_Flow_Tracking_Counting
+
+3. **Checkout the Flow_Tracking_Counting**  
+
+    Run the following command :
+    ```bash
+
+    git checkout Flow_Tracking_Counting
+
+
+4. **Change directory to Project Folder**    
+
+    Run the following command :
+    ```bash
+
+    cd vehicle-counting-yolov5
 
 3. **Install Dependencies**
 
