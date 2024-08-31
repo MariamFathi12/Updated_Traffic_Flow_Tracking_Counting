@@ -239,14 +239,14 @@ def detect(opt):
                 # It is the count of both incoming and outgoing vehicles 
                 
                 #Objects 
-                #cv2.putText(im0, "Cars:  "+str(car_count), (60, 250), font, 
-                #1.5, (20,255,0), 3, cv2.LINE_AA)                
+                cv2.putText(im0, "Cars:  "+str(car_count), (60, 250), font, 
+                1.5, (20,255,0), 3, cv2.LINE_AA)                
 
-                #cv2.putText(im0, "Trucks:  "+str(truck_count), (60, 350), font, 
-                #1.5, (20,255,0), 3, cv2.LINE_AA)  
+                cv2.putText(im0, "Trucks:  "+str(truck_count), (60, 350), font, 
+                1.5, (20,255,0), 3, cv2.LINE_AA)  
 
-                #cv2.putText(im0, "Busses:  "+str(bus_count), (60, 450), font, 
-                #1.5, (20,255,0), 3, cv2.LINE_AA)  
+                cv2.putText(im0, "Busses:  "+str(bus_count), (60, 450), font, 
+                1.5, (20,255,0), 3, cv2.LINE_AA)  
                 
 
                 
@@ -270,12 +270,15 @@ def detect(opt):
                     vid_path = save_path
                     if isinstance(vid_writer, cv2.VideoWriter):
                         vid_writer.release()  # release previous video writer
+
                     if vid_cap:  # video
                         fps = vid_cap.get(cv2.CAP_PROP_FPS)
                         w = int(vid_cap.get(cv2.CAP_PROP_FRAME_WIDTH))
                         h = int(vid_cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
                     else:  # stream
                         fps, w, h = 30, im0.shape[1], im0.shape[0]
+
+                    save_path = str(Path(save_path).with_suffix(".mp4"))  # force *.mp4 suffix on results videos
                     vid_writer = cv2.VideoWriter(save_path, cv2.VideoWriter_fourcc(*'mp4v'), fps, (1000,700))
                 vid_writer.write(im0)
 
@@ -325,12 +328,12 @@ def count_obj(box,w,h,id,direct,cls):
                 up_count +=1
                 tracker2.append(id)
                 
-                if cls==2:
-                    car_count+=1
-                elif cls==7:
-                    truck_count+=1
-                elif cls==5:
-                    bus_count+=1
+                #if cls==2:
+                #    car_count+=1
+                #elif cls==7:
+                #    truck_count+=1
+                #elif cls==5:
+                #    bus_count+=1
 
 
 
