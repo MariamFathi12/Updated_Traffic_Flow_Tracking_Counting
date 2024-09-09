@@ -6,9 +6,7 @@ This repository contains a project for traffic flow tracking and counting using 
 
 - [Prerequisites](#prerequisites)
 - [Installation](#installation)
-- [Directory Structure](#directory-structure)
 - [Running the Algorithm](#running-the-algorithm)
-- [Model Weights](#model-weights)
 
 
 ## Prerequisites
@@ -52,18 +50,19 @@ Make sure you have Python v3.10 installed on your system. You can download it fr
     ```bash
     git clone https://github.com/ultralytics/yolov5.git
 
-6. **Install Ultralytics**
-    ```bash
 
-    py -3.10 -m pip install ultralytics
-
-7.  **Install the required Python packages by running this in terminal :**
+6.  **Install the required Python packages by running this in terminal :**
      ```bash
 
     py -3.10 -m pip install -r requirements.txt
 
+7.  **IN CASE ERROR OCCURS ONLY Install Ultralytics**
+    ```bash
 
-6.  **Run the Tracking Algorithm**
+    py -3.10 -m pip install ultralytics
+
+
+8.  **Run the Tracking Algorithm**
     ```bash
 
      py -3.10 tracker.py      
