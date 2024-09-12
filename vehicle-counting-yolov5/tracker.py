@@ -29,6 +29,7 @@ from yolov5.utils.torch_utils import select_device, time_sync
 from yolov5.utils.plots import Annotator, colors
 from deep_sort.utils.parser import get_config
 from deep_sort.deep_sort import DeepSort
+from google.colab.patches import cv2_imshow
 
 FILE = Path(__file__).resolve()
 ROOT = FILE.parents[0]  # yolov5 deepsort root directory
@@ -257,7 +258,7 @@ def detect(opt):
 
                 im0 = cv2.resize(im0, (1000,700))
                 try :
-                    cv2.imshow('iKurious Traffic Management', im0)
+                    cv2_imshow(im0)
                     if cv2.waitKey(1) % 256 == 27:  # ESC code 
                         raise StopIteration  
                 except KeyboardInterrupt:
@@ -279,7 +280,7 @@ def detect(opt):
                         fps, w, h = 30, im0.shape[1], im0.shape[0]
 
                     save_path = str(Path(save_path).with_suffix(".mp4"))  # force *.mp4 suffix on results videos
-                    vid_writer = cv2.VideoWriter(save_path, cv2.VideoWriter_fourcc(*'mp4v'), fps, (1000,700))
+                    vid_writer = cv2.VideoWriter(save_path, cv2.VideoWriter_fourcc(*'mp4v'), 30, (1000,700))
                 vid_writer.write(im0)
 
     # Print results
