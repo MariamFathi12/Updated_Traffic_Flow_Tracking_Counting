@@ -179,12 +179,6 @@ def detect(opt):
 
 
                     im0 = cv2.resize(im0, (1000,700))
-                    try :
-                        cv2.imshow('iKurious Traffic Management', im0)
-                        if cv2.waitKey(1) % 256 == 27:  # ESC code 
-                            raise StopIteration  
-                    except KeyboardInterrupt:
-                        raise StopIteration
                     
 
                 # Save results (image with detections)
