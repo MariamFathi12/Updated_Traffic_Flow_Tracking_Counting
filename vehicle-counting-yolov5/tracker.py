@@ -115,182 +115,192 @@ def detect(opt):
     if pt and device.type != 'cpu':
         model(torch.zeros(1, 3, *imgsz).to(device).type_as(next(model.model.parameters())))  # warmup
     dt, seen = [0.0, 0.0, 0.0, 0.0], 0
-    for frame_idx, (path, img, im0s, vid_cap, s) in enumerate(dataset):
-        # print(f"Image: {img.shape} ")
-        # print(f"Image Type: {type(img)} ")
+    try:
         
-        t1 = time_sync()
+        for frame_idx, (path, img, im0s, vid_cap, s) in enumerate(dataset):
+            # print(f"Image: {img.shape} ")
+            # print(f"Image Type: {type(img)} ")
+            
+            t1 = time_sync()
 
 
-        img = torch.from_numpy(img).to(device)
-        img = img.half() if half else img.float()  # uint8 to fp16/32
-        img /= 255.0  # 0 - 255 to 0.0 - 1.0
-        if img.ndimension() == 3:
-            img = img.unsqueeze(0)
-        t2 = time_sync()
-        dt[0] += t2 - t1
+            img = torch.from_numpy(img).to(device)
+            img = img.half() if half else img.float()  # uint8 to fp16/32
+            img /= 255.0  # 0 - 255 to 0.0 - 1.0
+            if img.ndimension() == 3:
+                img = img.unsqueeze(0)
+            t2 = time_sync()
+            dt[0] += t2 - t1
 
 
-        # Inference
-        visualize = increment_path(save_dir / Path(path).stem, mkdir=True) if opt.visualize else False
-        pred = model(img, augment=opt.augment, visualize=visualize)
-        t3 = time_sync()
-        dt[1] += t3 - t2
+            # Inference
+            visualize = increment_path(save_dir / Path(path).stem, mkdir=True) if opt.visualize else False
+            pred = model(img, augment=opt.augment, visualize=visualize)
+            t3 = time_sync()
+            dt[1] += t3 - t2
 
-        # Apply NMS
-        pred = non_max_suppression(pred, opt.conf_thres, opt.iou_thres, opt.classes, opt.agnostic_nms, max_det=opt.max_det)
-        dt[2] += time_sync() - t3
+            # Apply NMS
+            pred = non_max_suppression(pred, opt.conf_thres, opt.iou_thres, opt.classes, opt.agnostic_nms, max_det=opt.max_det)
+            dt[2] += time_sync() - t3
 
-        # Process detections
-        for i, det in enumerate(pred):  # detections per image
-            start_time = time.time()
-            seen += 1
-            if webcam:  # batch_size >= 1
-                p, im0, _ = path[i], im0s[i].copy(), dataset.count
-                s += f'{i}: '
-            else:
-                p, im0, _ = path, im0s.copy(), getattr(dataset, 'frame', 0)
+            # Process detections
+            for i, det in enumerate(pred):  # detections per image
+                start_time = time.time()
+                seen += 1
+                if webcam:  # batch_size >= 1
+                    p, im0, _ = path[i], im0s[i].copy(), dataset.count
+                    s += f'{i}: '
+                else:
+                    p, im0, _ = path, im0s.copy(), getattr(dataset, 'frame', 0)
 
-            p = Path(p) 
-            save_path = str(save_dir / p.name)  # im.jpg, vid.mp4, ...
-            s += '%gx%g ' % img.shape[2:]  
+                p = Path(p) 
+                save_path = str(save_dir / p.name)  # im.jpg, vid.mp4, ...
+                s += '%gx%g ' % img.shape[2:]  
 
-            annotator = Annotator(im0, line_width=2, pil=not ascii)
-            w, h = im0.shape[1],im0.shape[0]
-            # print(f"W: {w} h {h}")F
-            if det is not None and len(det):
-                # Rescale boxes from img_size to im0 size
-                det[:, :4] = scale_boxes(
-                    img.shape[2:], det[:, :4], im0.shape).round()
+                annotator = Annotator(im0, line_width=2, pil=not ascii)
+                w, h = im0.shape[1],im0.shape[0]
+                # print(f"W: {w} h {h}")F
+                if det is not None and len(det):
+                    # Rescale boxes from img_size to im0 size
+                    det[:, :4] = scale_boxes(
+                        img.shape[2:], det[:, :4], im0.shape).round()
 
-                # Print results
-                for c in det[:, -1].unique():
-                    n = (det[:, -1] == c).sum()  # detections per class
-                    s += f"{n} {names[int(c)]}{'s' * (n > 1)}, "  # add to string
+                    # Print results
+                    for c in det[:, -1].unique():
+                        n = (det[:, -1] == c).sum()  # detections per class
+                        s += f"{n} {names[int(c)]}{'s' * (n > 1)}, "  # add to string
 
-                xywhs = xyxy2xywh(det[:, 0:4])
-                confs = det[:, 4]
-                clss = det[:, 5]
+                    xywhs = xyxy2xywh(det[:, 0:4])
+                    confs = det[:, 4]
+                    clss = det[:, 5]
 
-                # pass detections to deepsort
-                t4 = time_sync()
-                outputs = deepsort.update(xywhs.cpu(), confs.cpu(), clss.cpu(), im0)
-                t5 = time_sync()
-                dt[3] += t5 - t4
+                    # pass detections to deepsort
+                    t4 = time_sync()
+                    outputs = deepsort.update(xywhs.cpu(), confs.cpu(), clss.cpu(), im0)
+                    t5 = time_sync()
+                    dt[3] += t5 - t4
 
-                # draw boxes for visualization
-                if len(outputs) > 0:
-                    for j, (output, conf) in enumerate(zip(outputs, confs)):
+                    # draw boxes for visualization
+                    if len(outputs) > 0:
+                        for j, (output, conf) in enumerate(zip(outputs, confs)):
 
-                        bboxes = output[0:4]
-                        id = output[4]
-                        cls = output[5]
-                        # print(f"Img: {im0.shape}\n")
-                        _dir =  direction(id,bboxes[1])
+                            bboxes = output[0:4]
+                            id = output[4]
+                            cls = output[5]
+                            # print(f"Img: {im0.shape}\n")
+                            _dir =  direction(id,bboxes[1])
 
-                        #count
-                        count_obj(bboxes,w,h,id,_dir,int(cls))
-                        # print(im0.shape)
-                        c = int(cls)  # integer class
-                        label = f'{id} {names[c]} {conf:.2f}'
-                        annotator.box_label(bboxes, label, color=colors(c, True))
+                            #count
+                            count_obj(bboxes,w,h,id,_dir,int(cls))
+                            # print(im0.shape)
+                            c = int(cls)  # integer class
+                            label = f'{id} {names[c]} {conf:.2f}'
+                            annotator.box_label(bboxes, label, color=colors(c, True))
 
-                        if save_txt:
-                            # to MOT format
-                            bbox_left = output[0]
-                            bbox_top = output[1]
-                            bbox_w = output[2] - output[0]
-                            bbox_h = output[3] - output[1]
-                            # Write MOT compliant results to file
-                            with open(txt_path, 'a') as f:
-                                f.write(('%g ' * 10 + '\n') % (frame_idx + 1, id, bbox_left,  # MOT format
-                                                               bbox_top, bbox_w, bbox_h, -1, -1, -1, -1))
+                            if save_txt:
+                                # to MOT format
+                                bbox_left = output[0]
+                                bbox_top = output[1]
+                                bbox_w = output[2] - output[0]
+                                bbox_h = output[3] - output[1]
+                                # Write MOT compliant results to file
+                                with open(txt_path, 'a') as f:
+                                    f.write(('%g ' * 10 + '\n') % (frame_idx + 1, id, bbox_left,  # MOT format
+                                                                bbox_top, bbox_w, bbox_h, -1, -1, -1, -1))
 
-                LOGGER.info(f'{s}Done. YOLO:({t3 - t2:.3f}s), DeepSort:({t5 - t4:.3f}s)')
-                
+                    LOGGER.info(f'{s}Done. YOLO:({t3 - t2:.3f}s), DeepSort:({t5 - t4:.3f}s)')
+                    
+                        
+
+                else:
+                    deepsort.increment_ages()
+                    LOGGER.info('No detections')
+
+                # Stream results
+                im0 = annotator.result()
+                if show_vid:
+                    global up_count,down_count
+                    color=(0,0,255)
+                    # print(f"Shape: {im0.shape}")
+
+                    # Left Lane Line
+                    #cv2.line(im0, (0, h-300), (600, h-300), (255,0,0), thickness=3)
+
+                    # Right Lane Line
+                    cv2.line(im0,(500,h-300),(w,h-300),(0,0,255),thickness=3)
+                    
+                    thickness = 3 # font thickness
+                    font = cv2.FONT_HERSHEY_SIMPLEX
+                    fontScale = 2.5 
+                    #cv2.putText(im0, "Outgoing Traffic:  "+str(up_count), (60, 150), font, 
+                    #   fontScale, (0,0,255), thickness, cv2.LINE_AA)
+
+                    cv2.putText(im0, "Incoming Traffic:  "+str(down_count), (700,150), font, 
+                    fontScale, (0,255,0), thickness, cv2.LINE_AA)
+                    
+                    # -- Uncomment the below lines to computer car and truck count --
+                    # It is the count of both incoming and outgoing vehicles 
+                    
+                    #Objects 
+                    cv2.putText(im0, "Cars:  "+str(car_count), (60, 250), font, 
+                    1.5, (20,255,0), 3, cv2.LINE_AA)                
+
+                    cv2.putText(im0, "Trucks:  "+str(truck_count), (60, 350), font, 
+                    1.5, (20,255,0), 3, cv2.LINE_AA)  
+
+                    cv2.putText(im0, "Busses:  "+str(bus_count), (60, 450), font, 
+                    1.5, (20,255,0), 3, cv2.LINE_AA)  
                     
 
-            else:
-                deepsort.increment_ages()
-                LOGGER.info('No detections')
-
-            # Stream results
-            im0 = annotator.result()
-            if show_vid:
-                global up_count,down_count
-                color=(0,0,255)
-                # print(f"Shape: {im0.shape}")
-
-                # Left Lane Line
-                #cv2.line(im0, (0, h-300), (600, h-300), (255,0,0), thickness=3)
-
-                # Right Lane Line
-                cv2.line(im0,(500,h-300),(w,h-300),(0,0,255),thickness=3)
-                
-                thickness = 3 # font thickness
-                font = cv2.FONT_HERSHEY_SIMPLEX
-                fontScale = 2.5 
-                #cv2.putText(im0, "Outgoing Traffic:  "+str(up_count), (60, 150), font, 
-                #   fontScale, (0,0,255), thickness, cv2.LINE_AA)
-
-                cv2.putText(im0, "Incoming Traffic:  "+str(down_count), (700,150), font, 
-                   fontScale, (0,255,0), thickness, cv2.LINE_AA)
-                
-                # -- Uncomment the below lines to computer car and truck count --
-                # It is the count of both incoming and outgoing vehicles 
-                
-                #Objects 
-                cv2.putText(im0, "Cars:  "+str(car_count), (60, 250), font, 
-                1.5, (20,255,0), 3, cv2.LINE_AA)                
-
-                cv2.putText(im0, "Trucks:  "+str(truck_count), (60, 350), font, 
-                1.5, (20,255,0), 3, cv2.LINE_AA)  
-
-                cv2.putText(im0, "Busses:  "+str(bus_count), (60, 450), font, 
-                1.5, (20,255,0), 3, cv2.LINE_AA)  
-                
-
-                
-                end_time = time.time()
-                fps = 1 / (end_time - start_time)
-                cv2.putText(im0, "FPS: " + str(int(fps)), (10, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
+                    
+                    end_time = time.time()
+                    fps = 1 / (end_time - start_time)
+                    cv2.putText(im0, "FPS: " + str(int(fps)), (10, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
 
 
-                im0 = cv2.resize(im0, (1000,700))
-                try :
-                    cv2.imshow('iKurious Traffic Management', im0)
-                    if cv2.waitKey(1) % 256 == 27:  # ESC code 
-                        raise StopIteration  
-                except KeyboardInterrupt:
-                    raise StopIteration
-                
+                    im0 = cv2.resize(im0, (1000,700))
+                    try :
+                        cv2.imshow('iKurious Traffic Management', im0)
+                        if cv2.waitKey(1) % 256 == 27:  # ESC code 
+                            raise StopIteration  
+                    except KeyboardInterrupt:
+                        raise StopIteration
+                    
 
-            # Save results (image with detections)
-            if save_vid:
-                if vid_path != save_path:  # new video
-                    vid_path = save_path
-                    if isinstance(vid_writer, cv2.VideoWriter):
-                        vid_writer.release()  # release previous video writer
+                # Save results (image with detections)
+                if save_vid:
+                    if vid_path != save_path:  # new video
+                        vid_path = save_path
+                        if isinstance(vid_writer, cv2.VideoWriter):
+                            vid_writer.release()  # release previous video writer
 
-                    if vid_cap:  # video
-                        fps = vid_cap.get(cv2.CAP_PROP_FPS)
-                        w = int(vid_cap.get(cv2.CAP_PROP_FRAME_WIDTH))
-                        h = int(vid_cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
-                    else:  # stream
-                        fps, w, h = 30, im0.shape[1], im0.shape[0]
+                        if vid_cap:  # video
+                            fps = vid_cap.get(cv2.CAP_PROP_FPS)
+                            w = int(vid_cap.get(cv2.CAP_PROP_FRAME_WIDTH))
+                            h = int(vid_cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
+                        else:  # stream
+                            fps, w, h = 30, im0.shape[1], im0.shape[0]
 
-                    save_path = str(Path(save_path).with_suffix(".mp4"))  # force *.mp4 suffix on results videos
-                    vid_writer = cv2.VideoWriter(save_path, cv2.VideoWriter_fourcc(*'mp4v'), fps, (1000,700))
-                vid_writer.write(im0)
+                        save_path = str(Path(save_path).with_suffix(".mp4"))  # force *.mp4 suffix on results videos
+                        vid_writer = cv2.VideoWriter(save_path, cv2.VideoWriter_fourcc(*'mp4v'), fps, (1000,700))
+                    vid_writer.write(im0)
 
-    # Print results
-    t = tuple(x / seen * 1E3 for x in dt)  # speeds per image
-    LOGGER.info(f'Speed: %.1fms pre-process, %.1fms inference, %.1fms NMS, %.1fms deep sort update \
-        per image at shape {(1, 3, *imgsz)}' % t)
-    if save_txt or save_vid:
-        print('Results saved to %s' % save_path)
-        if platform == 'darwin':  # MacOS
-            os.system('open ' + save_path)
+        # Print results
+        t = tuple(x / seen * 1E3 for x in dt)  # speeds per image
+        LOGGER.info(f'Speed: %.1fms pre-process, %.1fms inference, %.1fms NMS, %.1fms deep sort update \
+            per image at shape {(1, 3, *imgsz)}' % t)
+        if save_txt or save_vid:
+            print('Results saved to %s' % save_path)
+            if platform == 'darwin':  # MacOS
+                os.system('open ' + save_path)
+    except KeyboardInterrupt:
+        print("Process interrupted by user.")
+    
+    finally:
+        # Ensure the video writer is released properly
+        if isinstance(vid_writer, cv2.VideoWriter):
+            vid_writer.release()
+        print("Video writer released and process completed.")
 
 
 
