@@ -280,7 +280,7 @@ def detect(opt):
                         fps, w, h = 30, im0.shape[1], im0.shape[0]
 
                     save_path = str(Path(save_path).with_suffix(".mp4"))  # force *.mp4 suffix on results videos
-                    vid_writer = cv2.VideoWriter(save_path, cv2.VideoWriter_fourcc(*'mp4v'), 30, (1000,700))
+                    vid_writer = cv2.VideoWriter(save_path, cv2.VideoWriter_fourcc(*'mp4v'), fps, (1000,700))
                 vid_writer.write(im0)
 
     # Print results
