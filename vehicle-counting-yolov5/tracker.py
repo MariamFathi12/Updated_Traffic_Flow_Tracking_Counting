@@ -29,7 +29,7 @@ from yolov5.utils.torch_utils import select_device, time_sync
 from yolov5.utils.plots import Annotator, colors
 from deep_sort.utils.parser import get_config
 from deep_sort.deep_sort import DeepSort
-from google.colab.patches import cv2_imshow
+
 
 FILE = Path(__file__).resolve()
 ROOT = FILE.parents[0]  # yolov5 deepsort root directory
@@ -258,7 +258,7 @@ def detect(opt):
 
                 im0 = cv2.resize(im0, (1000,700))
                 try :
-                    cv2_imshow(im0)
+                    cv2.imshow('iKurious Traffic Management', im0)
                     if cv2.waitKey(1) % 256 == 27:  # ESC code 
                         raise StopIteration  
                 except KeyboardInterrupt:
