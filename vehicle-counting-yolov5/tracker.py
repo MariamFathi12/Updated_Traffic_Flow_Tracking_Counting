@@ -18,7 +18,7 @@ from pathlib import Path
 import cv2
 import torch
 import torch.backends.cudnn as cudnn
-from google.colab.patches import cv2_imshow
+
 from yolov5.models.experimental import attempt_load
 from yolov5.utils.downloads import attempt_download
 from yolov5.models.common import DetectMultiBackend
@@ -53,7 +53,6 @@ def detect(opt):
     webcam = source == '0' or source.startswith(
         'rtsp') or source.startswith('http') or source.endswith('.txt')
     save_vid=True
-    show_vid=True
     # initialize deepsort
     cfg = get_config()
     cfg.merge_from_file(opt.config_deepsort)
@@ -258,7 +257,7 @@ def detect(opt):
 
                 im0 = cv2.resize(im0, (1000,700))
                 try :
-                    cv2_imshow(im0)
+                    cv2.imshow('iKurious Traffic Management', im0)
                     if cv2.waitKey(1) % 256 == 27:  # ESC code 
                         raise StopIteration  
                 except KeyboardInterrupt:
@@ -280,6 +279,7 @@ def detect(opt):
                         fps, w, h = 30, im0.shape[1], im0.shape[0]
 
                     save_path = str(Path(save_path).with_suffix(".mp4"))  # force *.mp4 suffix on results videos
+                    save_path='/content/saved_output.mp4'
                     vid_writer = cv2.VideoWriter(save_path, cv2.VideoWriter_fourcc(*'mp4v'), fps, (1000,700))
                 vid_writer.write(im0)
 
