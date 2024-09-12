@@ -52,7 +52,7 @@ def detect(opt):
         opt.save_txt, opt.imgsz, opt.evaluate, opt.half, opt.project, opt.name, opt.exist_ok
     webcam = source == '0' or source.startswith(
         'rtsp') or source.startswith('http') or source.endswith('.txt')
-
+    save_vid=True
     # initialize deepsort
     cfg = get_config()
     cfg.merge_from_file(opt.config_deepsort)
