@@ -18,7 +18,7 @@ from pathlib import Path
 import cv2
 import torch
 import torch.backends.cudnn as cudnn
-
+from google.colab.patches import cv2_imshow
 from yolov5.models.experimental import attempt_load
 from yolov5.utils.downloads import attempt_download
 from yolov5.models.common import DetectMultiBackend
@@ -257,7 +257,7 @@ def detect(opt):
 
                 im0 = cv2.resize(im0, (1000,700))
                 try :
-                    cv2.imshow('iKurious Traffic Management', im0)
+                    cv2_imshow(im0)
                     if cv2.waitKey(1) % 256 == 27:  # ESC code 
                         raise StopIteration  
                 except KeyboardInterrupt:
