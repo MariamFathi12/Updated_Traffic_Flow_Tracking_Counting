@@ -30,9 +30,6 @@ from yolov5.utils.plots import Annotator, colors
 from deep_sort.utils.parser import get_config
 from deep_sort.deep_sort import DeepSort
 
-from google.colab import drive
-drive.mount('/content/drive')
-
 FILE = Path(__file__).resolve()
 ROOT = FILE.parents[0]  # yolov5 deepsort root directory
 if str(ROOT) not in sys.path:
@@ -281,9 +278,8 @@ def detect(opt):
                     else:  # stream
                         fps, w, h = 30, im0.shape[1], im0.shape[0]
 
-                    #save_path = str(Path(save_path).with_suffix(".mp4"))  # force *.mp4 suffix on results videos
-                    save_path = '/content/drive/My Drive/output.mp4'
-                    vid_writer = cv2.VideoWriter(save_path, cv2.VideoWriter_fourcc(*'mp4v'), fps, (1000,700))
+                    save_path = str(Path(save_path).with_suffix(".mp4"))  # force *.mp4 suffix on results videos
+                    vid_writer = cv2.VideoWriter('tracking_output_2.mp4', cv2.VideoWriter_fourcc(*'XVID'), fps, (1000,700))
                 vid_writer.write(im0)
 
     # Print results
