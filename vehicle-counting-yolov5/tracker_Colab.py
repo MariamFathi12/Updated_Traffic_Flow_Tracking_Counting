@@ -93,106 +93,51 @@ def detect(opt):
     vid_path, vid_writer = None, None
     try:
         
-        for frame_idx, (path, img, im0s, vid_cap, s) in enumerate(dataset):
+        for frame_idx, (path, img, im0s, vid_cap, s) in enumerate(LoadImages(source, img_size=imgsz, stride=stride)):
             # print(f"Image: {img.shape} ")
             # print(f"Image Type: {type(img)} ")
             
             t1 = time_sync()
 
-
             img = torch.from_numpy(img).to(device)
             img = img.half() if half else img.float()  # uint8 to fp16/32
-            img /= 255.0  # 0 - 255 to 0.0 - 1.0
+            img /= 255.0  # Normalize
             if img.ndimension() == 3:
                 img = img.unsqueeze(0)
             t2 = time_sync()
-            dt[0] += t2 - t1
-
 
             # Inference
-            visualize = increment_path(save_dir / Path(path).stem, mkdir=True) if opt.visualize else False
-            pred = model(img, augment=opt.augment, visualize=visualize)
+            pred = model(img, augment=opt.augment, visualize=opt.visualize)
             t3 = time_sync()
-            dt[1] += t3 - t2
 
             # Apply NMS
             pred = non_max_suppression(pred, opt.conf_thres, opt.iou_thres, opt.classes, opt.agnostic_nms, max_det=opt.max_det)
-            dt[2] += time_sync() - t3
 
             # Process detections
             for i, det in enumerate(pred):  # detections per image
-                start_time = time.time()
-                seen += 1
-                if webcam:  # batch_size >= 1
-                    p, im0, _ = path[i], im0s[i].copy(), dataset.count
-                    s += f'{i}: '
-                else:
-                    p, im0, _ = path, im0s.copy(), getattr(dataset, 'frame', 0)
-
-                p = Path(p) 
-                save_path = str(save_dir / p.name)  # im.jpg, vid.mp4, ...
-                s += '%gx%g ' % img.shape[2:]  
-
+                im0 = im0s.copy()
                 annotator = Annotator(im0, line_width=2, pil=not ascii)
-                w, h = im0.shape[1],im0.shape[0]
-                # print(f"W: {w} h {h}")F
-                if det is not None and len(det):
-                    # Rescale boxes from img_size to im0 size
-                    det[:, :4] = scale_boxes(
-                        img.shape[2:], det[:, :4], im0.shape).round()
 
-                    # Print results
-                    for c in det[:, -1].unique():
-                        n = (det[:, -1] == c).sum()  # detections per class
-                        s += f"{n} {names[int(c)]}{'s' * (n > 1)}, "  # add to string
-
+                if len(det):
+                    det[:, :4] = scale_boxes(img.shape[2:], det[:, :4], im0.shape).round()
                     xywhs = xyxy2xywh(det[:, 0:4])
                     confs = det[:, 4]
                     clss = det[:, 5]
 
-                    # pass detections to deepsort
-                    t4 = time_sync()
+                    # Pass detections to DeepSort
                     outputs = deepsort.update(xywhs.cpu(), confs.cpu(), clss.cpu(), im0)
-                    t5 = time_sync()
-                    dt[3] += t5 - t4
 
-                    # draw boxes for visualization
+                    # Draw boxes for visualization
                     if len(outputs) > 0:
                         for j, (output, conf) in enumerate(zip(outputs, confs)):
-
                             bboxes = output[0:4]
                             id = output[4]
                             cls = output[5]
-                            # print(f"Img: {im0.shape}\n")
-                            _dir =  direction(id,bboxes[1])
-
+                            label = f'{id} {names[int(cls)]} {conf:.2f}'
+                            annotator.box_label(bboxes, label, color=colors(int(cls), True))
                             #count
-                            count_obj(bboxes,w,h,id,_dir,int(cls))
-                            # print(im0.shape)
-                            c = int(cls)  # integer class
-                            label = f'{id} {names[c]} {conf:.2f}'
-                            annotator.box_label(bboxes, label, color=colors(c, True))
+                            count_obj(bboxes,w,h,id,"South",int(cls))
 
-                            if save_txt:
-                                # to MOT format
-                                bbox_left = output[0]
-                                bbox_top = output[1]
-                                bbox_w = output[2] - output[0]
-                                bbox_h = output[3] - output[1]
-                                # Write MOT compliant results to file
-                                with open(txt_path, 'a') as f:
-                                    f.write(('%g ' * 10 + '\n') % (frame_idx + 1, id, bbox_left,  # MOT format
-                                                                bbox_top, bbox_w, bbox_h, -1, -1, -1, -1))
-
-                    LOGGER.info(f'{s}Done. YOLO:({t3 - t2:.3f}s), DeepSort:({t5 - t4:.3f}s)')
-                    
-                        
-
-                else:
-                    deepsort.increment_ages()
-                    LOGGER.info('No detections')
-
-                # Stream results
                 im0 = annotator.result()
                 if show_vid:
                     global up_count,down_count
@@ -230,7 +175,6 @@ def detect(opt):
 
                     
                     end_time = time.time()
-                    fps = 1 / (end_time - start_time)
                     cv2.putText(im0, "FPS: " + str(int(fps)), (10, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
 
 
@@ -261,14 +205,6 @@ def detect(opt):
                         vid_writer = cv2.VideoWriter(save_path, cv2.VideoWriter_fourcc(*'mp4v'), fps, (1000,700))
                     vid_writer.write(im0)
 
-        # Print results
-        t = tuple(x / seen * 1E3 for x in dt)  # speeds per image
-        LOGGER.info(f'Speed: %.1fms pre-process, %.1fms inference, %.1fms NMS, %.1fms deep sort update \
-            per image at shape {(1, 3, *imgsz)}' % t)
-        if save_txt or save_vid:
-            print('Results saved to %s' % save_path)
-            if platform == 'darwin':  # MacOS
-                os.system('open ' + save_path)
     except KeyboardInterrupt:
         print("Process interrupted by user.")
     
