@@ -117,7 +117,7 @@ def detect(opt):
             for i, det in enumerate(pred):  # detections per image
                 im0 = im0s.copy()
                 annotator = Annotator(im0, line_width=2, pil=not ascii)
-
+                w, h = im0.shape[1],im0.shape[0]
                 if len(det):
                     det[:, :4] = scale_boxes(img.shape[2:], det[:, :4], im0.shape).round()
                     xywhs = xyxy2xywh(det[:, 0:4])
