@@ -118,8 +118,7 @@ def detect(opt):
                 im0 = im0s.copy()
                 annotator = Annotator(im0, line_width=2, pil=not ascii)
                 w, h = im0.shape[1],im0.shape[0]
-                p = Path(p) 
-                save_path = str(save_dir / p.name)  # im.jpg, vid.mp4, ...
+
                 if len(det):
                     det[:, :4] = scale_boxes(img.shape[2:], det[:, :4], im0.shape).round()
                     xywhs = xyxy2xywh(det[:, 0:4])
@@ -181,25 +180,13 @@ def detect(opt):
 
 
                     im0 = cv2.resize(im0, (1000,700))
-                    
 
-                # Save results (image with detections)
-                if save_vid:
-                    if vid_path != save_path:  # new video
-                        vid_path = save_path
-                        if isinstance(vid_writer, cv2.VideoWriter):
-                            vid_writer.release()  # release previous video writer
+                fps = vid_cap.get(cv2.CAP_PROP_FPS)
+                w = int(vid_cap.get(cv2.CAP_PROP_FRAME_WIDTH))
+                h = int(vid_cap.get(cv2.CAP_PROP_FRAME_HEIGHT))    
+                vid_writer = cv2.VideoWriter('output.mp4', cv2.VideoWriter_fourcc(*'mp4v'), fps, (1000,700))
 
-                        if vid_cap:  # video
-                            fps = vid_cap.get(cv2.CAP_PROP_FPS)
-                            w = int(vid_cap.get(cv2.CAP_PROP_FRAME_WIDTH))
-                            h = int(vid_cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
-                        else:  # stream
-                            fps, w, h = 30, im0.shape[1], im0.shape[0]
-
-                        save_path = str(Path(save_path).with_suffix(".mp4"))  # force *.mp4 suffix on results videos
-                        vid_writer = cv2.VideoWriter(save_path, cv2.VideoWriter_fourcc(*'mp4v'), fps, (1000,700))
-                    vid_writer.write(im0)
+                vid_writer.write(im0)
 
     except KeyboardInterrupt:
         print("Process interrupted by user.")
