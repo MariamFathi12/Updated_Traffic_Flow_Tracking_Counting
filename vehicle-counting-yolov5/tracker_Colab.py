@@ -181,12 +181,21 @@ def detect(opt):
 
                     im0 = cv2.resize(im0, (1000,700))
 
-                fps = vid_cap.get(cv2.CAP_PROP_FPS)
-                w = int(vid_cap.get(cv2.CAP_PROP_FRAME_WIDTH))
-                h = int(vid_cap.get(cv2.CAP_PROP_FRAME_HEIGHT))    
-                vid_writer = cv2.VideoWriter('output.mp4', cv2.VideoWriter_fourcc(*'mp4v'), fps, (1000,700))
+                
+                # Define save_path to save the processed video
+                save_path = str(Path(save_dir) / Path(path).name)
 
-                vid_writer.write(im0)
+                # Save video results
+                if save_vid:
+                    if vid_path != save_path:  # New video
+                        vid_path = save_path
+                        if isinstance(vid_writer, cv2.VideoWriter):
+                            vid_writer.release()  # Release previous video writer
+
+                        # Set video writer to match input resolution
+                        vid_writer = cv2.VideoWriter(save_path, fourcc, fps, (frame_width, frame_height))
+
+                    vid_writer.write(im0)
 
     except KeyboardInterrupt:
         print("Process interrupted by user.")
