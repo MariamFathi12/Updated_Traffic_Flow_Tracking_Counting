@@ -193,7 +193,7 @@ def detect(opt):
                             vid_writer.release()  # Release previous video writer
 
                         # Set video writer to match input resolution
-                        vid_writer = cv2.VideoWriter(save_path, fourcc, fps, (frame_width, frame_height))
+                        vid_writer = cv2.VideoWriter('saved_updated_output.mp4', fourcc, fps, (frame_width, frame_height))
 
                     vid_writer.write(im0)
 
